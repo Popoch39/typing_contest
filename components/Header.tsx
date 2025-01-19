@@ -25,18 +25,20 @@ import {
 import { UserType } from "@/types/userType";
 import { signOut, useSession } from "next-auth/react";
 import { User } from "@prisma/client";
+import { redirect } from "next/navigation";
 
 export default function Header() {
   const { setTheme, theme } = useTheme();
   const { data: session, status } = useSession();
+
   const user = session?.user as User;
 
   console.log(theme);
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 max-w-screen-2xl items-center">
+      <div className="flex h-20 -full items-center p-4">
         <div className="mr-4 hidden md:flex">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
+          <Link href="/home" className="mr-6 flex items-center space-x-2">
             <span className="hidden font-bold sm:inline-block">MyApp</span>
           </Link>
           <NavigationMenu>
@@ -70,25 +72,17 @@ export default function Header() {
             {/* Add search functionality here if needed */}
           </div>
           <nav className="flex items-center">
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label="Toggle theme"
-              className="mr-6"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            >
-              <SunIcon className="h-6 w-6 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <MoonIcon className="absolute h-6 w-6 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              <span className="sr-only">Toggle theme</span>
-            </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
                   className="relative h-8 w-8 rounded-full"
                 >
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.image} alt="@johndoe" />
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage
+                      src={user.image as string | undefined}
+                      alt={`@${user.username}`}
+                    />
                     <AvatarFallback>JD</AvatarFallback>
                   </Avatar>
                 </Button>
@@ -96,7 +90,9 @@ export default function Header() {
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">John Doe</p>
+                    <p className="text-sm font-medium leading-none">
+                      {user.username}
+                    </p>
                     <p className="text-xs leading-none text-muted-foreground">
                       {user.email}
                     </p>
@@ -104,6 +100,22 @@ export default function Header() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>Profile</DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Toggle theme"
+                    className="mr-6"
+                    onClick={() =>
+                      setTheme(theme === "dark" ? "light" : "dark")
+                    }
+                  >
+                    <SunIcon className="h-6 w-6 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                    <MoonIcon className="absolute h-6 w-6 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                    <span className="sr-only">Toggle theme</span>
+                  </Button>
+                </DropdownMenuItem>
+
                 <DropdownMenuItem>Settings</DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onMouseDown={() => signOut()}>

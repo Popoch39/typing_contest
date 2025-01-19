@@ -16,7 +16,7 @@ export function LoginForm({
 }: React.ComponentPropsWithoutRef<"div">) {
   const handleCLick = async (provider: string) => {
     await signIn(provider, {
-      callbackUrl: "/",
+      callbackUrl: "/home",
     });
   };
 

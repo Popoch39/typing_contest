@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { getServerSession } from "next-auth";
-import { authOptions } from "./api/auth/[...nextauth]/route";
+import { authOptions } from "../api/auth/[...nextauth]/route";
 import SessionClientProvider from "@/providers/SessionProvider";
 import Header from "@/components/Header";
 import { redirect } from "next/navigation";
+import SideBar from "@/components/SideBar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,15 +30,13 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await getServerSession(authOptions);
-
   if (!session) {
     redirect("/login");
   }
-
   return (
     <html lang="en" className="h-dvh w-dvw">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased w-full h-full`}
       >
         <SessionClientProvider session={session}>
           <ThemeProvider
@@ -46,8 +45,7 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Header />
-            {children}
+            <SideBar>{children}</SideBar>
           </ThemeProvider>
         </SessionClientProvider>
       </body>
