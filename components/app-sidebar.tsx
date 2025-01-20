@@ -69,7 +69,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  <Avatar className="mr-2 h-6 w-6">
+                  <Avatar className="h-10 w-10 rounded-lg">
                     <AvatarImage
                       src={user.image as string | undefined}
                       alt={`@${user.username}`}

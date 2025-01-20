@@ -5,5 +5,9 @@ import TestGame from "@/components/testGame";
 export default async function () {
   const session = await getServerSession(authOptions);
 
-  return <></>;
+  return (
+    <div className="h-full w-full flex justify-center items-start p-3">
+      <TestGame />
+    </div>
+  );
 }
