@@ -1,200 +1,63 @@
 "use client";
+export const headers = {
+  "Cache-Control": "no-store",
+};
 
-import { useState, useEffect } from "react";
+export const dynamic = "force-dynamic";
+
+import { useState } from "react";
 import { LineShadowText } from "./ui/line-shadow-text";
 import { useTheme } from "next-themes";
 const words = [
-  "arbre",
-  "bouteille",
-  "ciel",
-  "drapeau",
-  "étoile",
-  "forêt",
-  "guitare",
-  "horizon",
-  "imagination",
-  "jongler",
-  "kayak",
-  "lumière",
-  "montagne",
-  "nuage",
-  "océan",
-  "papillon",
-  "quintessence",
-  "rivière",
-  "soleil",
-  "tigre",
-  "univers",
-  "vélo",
-  "wagon",
-  "xylophone",
-  "yoga",
-  "zèbre",
-  "abeille",
-  "abricot",
-  "acier",
-  "aventure",
-  "ami",
-  "bateau",
-  "bijou",
-  "bruit",
-  "bureau",
-  "cerise",
-  "chaise",
-  "chanson",
-  "chemin",
-  "citron",
-  "clé",
-  "danse",
-  "dauphin",
-  "désert",
-  "diamant",
-  "dictionnaaire",
-  "éléphant",
-  "énergie",
-  "éponge",
-  "escargot",
-  "étoile",
-  "fleur",
-  "flamme",
-  "forêt",
-  "fromage",
-  "fusée",
-  "girafe",
-  "guitare",
-  "grenouille",
-  "gâteau",
-  "horloge",
-  "horizon",
-  "histoire",
-  "hôpital",
-  "humour",
-  "île",
-  "imagination",
-  "insecte",
-  "invitation",
-  "jardin",
-  "jongler",
-  "journal",
-  "kayak",
-  "koala",
-  "kimono",
-  "lampe",
-  "livre",
-  "lune",
-  "lumière",
-  "machine",
-  "magicien",
-  "montagne",
-  "musique",
-  "nuit",
-  "nuage",
-  "océan",
-  "ordinateur",
-  "orange",
-  "ours",
-  "pain",
-  "papillon",
-  "parapluie",
-  "piano",
-  "poisson",
-  "pont",
-  "quiche",
-  "question",
-  "quintessence",
-  "radio",
-  "rivière",
-  "robot",
-  "rouge",
-  "sable",
-  "sapin",
-  "soleil",
-  "souris",
-  "table",
-  "tigre",
-  "train",
-  "trésor",
-  "tulipe",
-  "univers",
-  "usine",
-  "valise",
-  "vélo",
-  "vent",
-  "wagon",
-  "walabi",
-  "xylophone",
-  "yaourt",
-  "yoga",
-  "zèbre",
-  "zoo",
+  ["arbre", "bouteille", "ciel", "drapeau", "étoile"],
+  ["forêt", "guitare", "horizon", "imagination", "jongler", "kayak"],
+  ["lumière", "montagne", "nuage", "océan", "papillon"],
+  ["quintessence", "rivière", "soleil", "tigre", "univers"],
+  ["vélo", "wagon", "xylophone", "yoga", "zèbre"],
 ];
 const TestGame = () => {
   const theme = useTheme();
-  const [currentWord, setCurrentWord] = useState("");
+  const shadowColor = theme.resolvedTheme === "dark" ? "blue" : "red";
+
   const [inputValue, setInputValue] = useState("");
-  const [score, setScore] = useState(0);
-  const [errors, setErrors] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(30);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  // useEffect(() => {
-  //   // Choisir un mot aléatoire au début
-  //   setCurrentWord(getRandomWord());
-  //
-  //   // Démarrer le compte à rebours
-  //   const timer = setInterval(() => {
-  //     setTimeLeft((prevTime) => Math.max(prevTime - 1, 0));
-  //   }, 1000);
-  //
-  //   return () => clearInterval(timer); // Nettoyer le timer
-  // }, []);
-
-  useEffect(() => {
-    if (timeLeft === 0) {
-      alert(`Temps écoulé ! Score final : ${score}, Fautes : ${errors}`);
-      resetGame();
-    }
-  }, [timeLeft]);
-
-  const getRandomWord = () => words[Math.floor(Math.random() * words.length)];
+  const targetText = words.map((row) => row.join(" ")).join(" ");
 
   const handleInputChange = (e) => {
     const value = e.target.value;
-    setInputValue(value);
 
-    if (value.trim() === currentWord) {
-      setScore((prevScore) => prevScore + 1);
-      setCurrentWord(getRandomWord());
-      setInputValue("");
-    } else if (!currentWord.startsWith(value.trim())) {
-      setErrors((prevErrors) => prevErrors + 1);
+    // Vérification lettre par lettre
+    if (value.length <= targetText.length) {
+      setInputValue(value);
+      setCurrentIndex(value.length);
     }
   };
 
-  const resetGame = () => {
-    setCurrentWord(getRandomWord());
-    setInputValue("");
-    setScore(0);
-    setErrors(0);
-    setTimeLeft(30);
-  };
-
-  const shadowColor = theme.resolvedTheme === "dark" ? "blue" : "red";
   return (
-    <div className="w-2/3 h-auto border-solid border-2 border-indigo-500">
-      <div className="flex flex-row justify-center items-center flex-wrap">
-        {words.map((word, k: number) => (
-          <h1 className="text-balance text-5xl font-semibold leading-none tracking-tighter sm:text-6xl md:text-7xl lg:text-8xl">
-            Ship
-            <LineShadowText
-              className="italic"
-              shadowColor={shadowColor}
-              key={k}
-            >
-              {word}
-            </LineShadowText>
-          </h1>
+    <div className="w-2/3 h-auto border-solid border-2 border-indigo-500 p-4">
+      <div className="flex flex-wrap text-5xl font-semibold leading-none tracking-tighter sm:text-6xl md:text-7xl lg:text-8xl">
+        {targetText.split("").map((char, index) => (
+          <span
+            key={index}
+            className={
+              index < inputValue.length
+                ? inputValue[index] === char
+                  ? "text-green-500" // Lettre correcte
+                  : "text-red-500" // Lettre incorrecte
+                : "text-gray-500" // Lettre pas encore tapée
+            }
+          >
+            {char === " " ? "\u00A0" : char} {/* Garde les espaces visibles */}
+          </span>
         ))}
       </div>
+      <input
+        type="text"
+        value={inputValue}
+        onChange={handleInputChange}
+        className="mt-4 p-2 border border-gray-300 text-3xl tracking-widest text-center w-full"
+      />
     </div>
   );
 };

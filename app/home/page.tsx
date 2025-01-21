@@ -1,7 +1,9 @@
 import { getServerSession } from "next-auth";
+
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import TestGame from "@/components/testGame";
 
+export const dynamic = "force-dynamic";
 export default async function () {
   const session = await getServerSession(authOptions);
 
