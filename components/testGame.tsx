@@ -8,6 +8,7 @@ export const dynamic = "force-dynamic";
 import { useState } from "react";
 import { LineShadowText } from "./ui/line-shadow-text";
 import { useTheme } from "next-themes";
+import useGameServer from "@/hooks/useGameServer";
 const wordList = [
   "arbre",
   "bouteille",
@@ -33,6 +34,7 @@ const POINTS_PER_WORD = 10;
 
 const TestGame = () => {
   const theme = useTheme();
+  useGameServer();
   const shadowColor = theme.resolvedTheme === "dark" ? "blue" : "red";
   const [score, setScore] = useState(0);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
