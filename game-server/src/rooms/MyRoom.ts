@@ -8,6 +8,7 @@ export class MyRoom extends Room<MyRoomState> {
     this.setState(new MyRoomState());
 
     this.onMessage("type", (client, message) => {
+      console.log(client, message);
       //
       // handle "type" message
       //
@@ -19,10 +20,12 @@ export class MyRoom extends Room<MyRoomState> {
   }
 
   onLeave(client: Client, consented: boolean) {
+    console.log("leaving", consented);
     console.log(client.sessionId, "left!");
   }
 
   onDispose() {
+    // matches end, persist data? 
     console.log("room", this.roomId, "disposing...");
   }
 }

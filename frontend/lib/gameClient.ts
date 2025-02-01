@@ -8,17 +8,11 @@ export const createClient = (): Client => {
 
 export const createRoom = async (
   client: Client,
-  roomName: string,
 ): Promise<void> => {
+  const roomName = "my_room"
   console.log(roomName);
-  let timer = 100;
-  while (timer > 0) {
-    const room = await client.joinOrCreate(roomName, {
-      code: "one",
-    });
-
-    await room.leave();
-    timer -= 1;
-    console.log("room id", room.roomId);
-  }
+  const room = await client.joinOrCreate(roomName, {
+    code: "one",
+  });
+  console.log("room id", room.roomId);
 };
