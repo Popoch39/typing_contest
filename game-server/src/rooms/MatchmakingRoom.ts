@@ -5,7 +5,8 @@ import { ExtractUserData, ExtractAuthData } from "@colyseus/core/build/Room";
 import { PlayerState } from "./schema/PlayerState";
 
 export class MatchmakingRoom extends Room<MatchState> {
-  maxClients: number = 3;
+  maxClients: number = 2;
+  private acceptanceTimeout: NodeJS.Timeout
 
   requestJoin(options: any) {
     // Prevent the client from joining the same room from another browser tab
@@ -15,16 +16,28 @@ export class MatchmakingRoom extends Room<MatchState> {
   async onCreate() {
     this.setState(new MatchState());
 
-    this.onMessage("ready", (client: Client) => {
+    this.onMessage("acceptMatch", (client: Client) => {
       const player = this.state.players.get(client.sessionId);
-      if (player) {
+      if (player && this.state.isWaitingForAcceptance) {
+        player.hasAccepted = true;
         player.ready = true;
-
-        // check if all users are ready
-        if (this.areAllPlayersReady()) {
-          this.broadcast("matchStarted");
+        console.log(player);
+        this.broadcast("playerAccepted", { playerId: client.sessionId });
+        // check if all users have accepted
+        if (this.haveAllPlayersAccepted()) {
+          this.clearAcceptanceTimeout();
+          this.setAllPlayersReady();
+          this.broadcast("matchAccepted")
           this.createGameRoom();
         }
+      }
+    })
+
+    this.onMessage("declineMatch", (client: Client) => {
+      if (this.state.isWaitingForAcceptance) {
+        this.clearAcceptanceTimeout()
+        this.broadcast("matchDeclined", { playerId: client.sessionId });
+        this.resetMatchmaking();
       }
     })
   }
@@ -35,25 +48,68 @@ export class MatchmakingRoom extends Room<MatchState> {
     this.state.players.set(client.sessionId, player);
 
     client.send("joined");
+    console.log("joined !");
 
     if (this.clients.length === this.maxClients) {
-      this.broadcast("roomFull");
+      this.startMatchAcceptancePhase();
     }
   }
 
   onLeave(client: Client) {
+    if (this.state.isWaitingForAcceptance) {
+      this.clearAcceptanceTimeout();
+      this.broadcast("matchCancelled", { reason: "Un joueur a quitté" });
+      this.resetMatchmaking();
+    }
     this.state.players.delete(client.sessionId);
   }
 
-  areAllPlayersReady = () => {
-    let allReady = true;
-    this.state.players.forEach((player) => {
-      if (!player.ready) allReady = false;
-    });
+  private startMatchAcceptancePhase = () => {
+    this.state.isWaitingForAcceptance = true;
 
-    // if alone in room are allPlayersReady should be false;
-    return allReady && this.clients.length === this.maxClients;
+    this.broadcast("matchFound", {
+      timeout: this.state.matchAcceptanceTimeout,
+      players: Array.from(this.state.players.values().map(p => p.id))
+    })
+
+    this.acceptanceTimeout = setTimeout(() => {
+      if (!this.haveAllPlayersAccepted()) {
+        this.broadcast("matchCancelled", { reason: "Temps d'acceptation dépassé" });
+        this.resetMatchmaking();
+      }
+    }, this.state.matchAcceptanceTimeout * 1000)
   }
+
+  private haveAllPlayersAccepted = (): boolean => {
+    let allAccepted = true;
+    this.state.players.forEach((player) => {
+      console.log(player);
+      if (player.hasAccepted === false) {
+        allAccepted = false;
+      }
+    })
+    return allAccepted;
+  }
+
+  private setAllPlayersReady = () => {
+    this.state.players.forEach((player) => {
+      player.ready = true;
+    });
+  }
+
+  private clearAcceptanceTimeout = () => {
+    if (this.acceptanceTimeout) {
+      clearTimeout(this.acceptanceTimeout);
+    }
+  }
+
+  private resetMatchmaking = () => {
+    this.state.isWaitingForAcceptance = false;
+    this.state.players.forEach((player) => {
+      player.hasAccepted = false;
+      player.ready = false;
+    });
+  };
 
   createGameRoom = async () => {
     try {

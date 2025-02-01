@@ -1,18 +1,15 @@
 "use client";
 import { createClient, createRoom } from "@/lib/gameClient";
-import { useEffect } from "react";
+import { Client } from "colyseus.js";
+import { useEffect, useState } from "react";
 
 const useGameServer = () => {
-
-	const a = [1, 2, 3]
-
+  const [client, setClient] = useState<Client|null>(null);
   useEffect(() => {
-    const client = createClient();
-
-    createRoom(client);
+    setClient(createClient());
   }, []);
 
-  return null;
+  return client;
 };
 
 export default useGameServer;
