@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import SideBar from "@/components/SideBar";
+import MatchFoundDialog from "@/components/MatchFoundDialog";
 
 export default async function HomeLayout({
   children,
@@ -16,7 +17,11 @@ export default async function HomeLayout({
 
   return (
     <SessionClientProvider session={session}>
-      <SideBar>{children}</SideBar>
+      <SideBar>
+        <MatchFoundDialog /> 
+        {children}
+      </SideBar>
+
     </SessionClientProvider>
   );
 }

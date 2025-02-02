@@ -3,16 +3,19 @@
 import useGameServer from "@/hooks/useGameServer";
 import { joinMatchMaking } from "@/lib/gameClient";
 import { Button } from "./ui/button";
-import useGameStore from "@/stores/GameStore";
 import AlertDialog from "./AlertDialog";
 import useMatchmakingEvents from "@/hooks/useMatchmakingEvents";
+import useMatchmakingStore from "@/stores/MatchMakingStore";
+import { useState } from "react";
 
 const TestComponent = () => {
-  const room = useGameStore(state => state.currentRoom)
-  const matchmakingStatus = useGameStore((state) => state.status);
-  const updateRoom = useGameStore(state => state.updateRoom);
+  const [modalOpen, setModalOpen] = useState(false);
+  const room = useMatchmakingStore(state => state.currentRoom)
+    const status = useMatchmakingStore(state => state.status)
+  const matchmakingStatus = useMatchmakingStore((state) => state.status);
+  const updateRoom = useMatchmakingStore(state => state.updateRoom);
   const client = useGameServer();
-    useMatchmakingEvents(client)
+  useMatchmakingEvents(client)
 
   const handleClick = () => {
     if (!client) {
@@ -38,7 +41,6 @@ const TestComponent = () => {
       ) : (
         <Button onMouseDown={hanleQuit}>Quitter la file</Button>
       )}
-      <AlertDialog open={false} />
     </>
   )
 };

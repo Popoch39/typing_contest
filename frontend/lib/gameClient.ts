@@ -19,7 +19,9 @@ export const createRoom = async (
 
 export const joinMatchMaking = async (client: Client, updateRoom: (data: any) => void) => {
   try {
-    const room = await client.joinOrCreate("matchmaking");
+    const room = await client.joinOrCreate("matchmaking", {
+      elo: 2000
+    });
     updateRoom(room);
   } catch (error: any) {
     console.error("error joining the matchmaking", error)

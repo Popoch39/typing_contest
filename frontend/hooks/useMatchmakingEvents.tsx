@@ -1,12 +1,12 @@
 import { joinGameRoom } from "@/lib/gameClient";
-import useGameStore from "@/stores/GameStore";
+import useMatchmakingStore from "@/stores/MatchMakingStore";
 import { Client } from "colyseus.js";
 import { useEffect } from "react";
 
-const useMatchmakingEvents = (client: Client) => {
-  const room = useGameStore(state => state.currentRoom);
-  const updateStatus = useGameStore(state => state.updateStatus);
-  const updateRoom = useGameStore(state => state.updateRoom)
+const useMatchmakingEvents = (client: Client | null) => {
+  const room = useMatchmakingStore(state => state.currentRoom);
+  const updateStatus = useMatchmakingStore(state => state.updateStatus);
+  const updateRoom = useMatchmakingStore(state => state.updateRoom)
 
   useEffect(() => {
     if (!room) return;
@@ -23,6 +23,7 @@ const useMatchmakingEvents = (client: Client) => {
     room.onMessage("matchFound", (data) => {
       console.log('match found you have ' + data.timeout + "sec to accept")
       console.log("players => ", data.players)
+      updateStatus("gameFound");
     })
 
     room.onMessage("playerAccepted", (data) => {
@@ -49,12 +50,18 @@ const useMatchmakingEvents = (client: Client) => {
     })
 
     room.onMessage("gameReady", (data: any) => {
-      console.log('game room is ready');
-      joinGameRoom(client, data.roomId, data.reservation)
+      try {
+        if (!client) {
+          throw new Error("aucun client trouvé")
+        }
+        console.log('game room is ready');
+        joinGameRoom(client, data.roomId, data.reservation)
+      } catch (e) {
+        console.error("aucun client trouvé => ", e);
+      }
     })
 
-
-  }, [room]);
+  }, [client, room]);
 
 };
 
