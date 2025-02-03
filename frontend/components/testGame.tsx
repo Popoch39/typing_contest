@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 const wordList = [
   "arbre",
   "bouteille",
-  "drapeau",
+  "drapeaux",
 ];
 const POINTS_PER_WORD = 10;
 
