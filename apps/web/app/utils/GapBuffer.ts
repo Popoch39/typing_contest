@@ -24,7 +24,7 @@ class GapBuffer {
       // gs = 3; cursor = 1; moveCount == 2
       // loop sur les 2 index (moveCount)
       for (let i = 0; i < moveCount; i++) {
-        this.buffer[this.gapEnd - 1 - i] = this.buffer[this.gapEnd - 1 - i]!;
+        this.buffer[this.gapEnd - 1 - i] = this.buffer[this.gapStart - 1 - i]!;
         this.buffer[this.gapStart - 1 - i] = null;
       }
       this.gapStart -= moveCount;
@@ -77,13 +77,12 @@ class GapBuffer {
   }
 
   public deleteBackWard(): boolean {
-    if (this.cursor === this.length()) return false;
+    if (this.cursor === 0) return false;
 
     this.moveGapToCursor();
     this.gapStart--;
     this.cursor--;
     this.buffer[this.gapStart] = null;
-    this.gapEnd++;
     return true;
   }
 
@@ -91,7 +90,6 @@ class GapBuffer {
     if (this.cursor === this.length()) return false;
 
     this.moveGapToCursor();
-    this.buffer[this.gapEnd] = null;
     this.gapEnd++;
     return true;
   }
