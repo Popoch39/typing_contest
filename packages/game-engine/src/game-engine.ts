@@ -115,8 +115,6 @@ class GameEngine {
     return !this.cursorWordIndex;
   }
 
-
-
   public printDebug(): void {
     console.log("[36mbuffer : [0m", this.buffer);
     console.log("[36mgameBuffer: [0m", this.gameBuffer);
