@@ -249,3 +249,53 @@ describe('GameEngine Utils', () => {
     expect(gameEngine.isPreviousWordRight()).toBe(false);
   });
 });
+
+describe('GameEngine: New Features', () => {
+  let gameEngine: GameEngine;
+  const buffer = ['hello', 'world'];
+
+  beforeEach(() => {
+    // @ts-ignore
+    GameEngine.instance = undefined;
+    gameEngine = GameEngine.getInstance(buffer);
+  });
+
+  it('isFinished() should return true only when the last word is typed correctly', () => {
+    expect(gameEngine.isFinished()).toBe(false);
+    'hello '.split('').forEach(char => gameEngine.handleKeyStroke(char));
+    expect(gameEngine.isFinished()).toBe(false);
+    'world'.split('').forEach(char => gameEngine.handleKeyStroke(char));
+    expect(gameEngine.isFinished()).toBe(true);
+  });
+
+  it('isFinished() should return false if the last word is incorrect', () => {
+    'hello '.split('').forEach(char => gameEngine.handleKeyStroke(char));
+    'worl'.split('').forEach(char => gameEngine.handleKeyStroke(char)); // Incorrect word
+    expect(gameEngine.isFinished()).toBe(false);
+  });
+
+  it('reset() should clear the game state and stats', () => {
+    gameEngine.handleKeyStroke('h');
+    gameEngine.handleKeyStroke(' ');
+    gameEngine.reset();
+
+    expect(gameEngine.wordIndex).toBe(0);
+    expect(gameEngine.cursorWordIndex).toBe(0);
+    expect(gameEngine.gameBuffer).toEqual([]);
+    expect(gameEngine.stats.isStarted()).toBe(false);
+    expect(gameEngine.isFinished()).toBe(false);
+  });
+
+  it('getWordState() should correctly identify word states', () => {
+    // Correct word
+    'hello '.split('').forEach(char => gameEngine.handleKeyStroke(char));
+    expect(gameEngine.getWordState(0)).toBe('correct');
+
+    // Current/untyped word
+    expect(gameEngine.getWordState(1)).toBe('untyped');
+
+    // Incorrect word
+    'worl '.split('').forEach(char => gameEngine.handleKeyStroke(char));
+    expect(gameEngine.getWordState(1)).toBe('incorrect');
+  });
+});
